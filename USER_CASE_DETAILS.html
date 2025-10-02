@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TRACE | Case Dashboard</title>
+  <link rel="icon" type="image/png" href="CENTRAL_GOVERNMENT.jpg" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #1e293b;
+      --accent: #00f7ff;
+      --text: #f8fafc;
+      --text-light: #e2e8f0;
+      --text-lighter: #94a3b8;
+      --bg-dark: #0f172a;
+      --bg-darker: #020617;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --info: #3b82f6;
+      --border: rgba(255,255,255,0.1);
+      --card-bg: rgba(30, 41, 59, 0.5);
+      --card-hover: rgba(30, 41, 59, 0.8);
+    }
+    
+    * { 
+      margin:0; 
+      padding:0; 
+      box-sizing:border-box; 
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    
+    body, html { 
+      height:100%; 
+      background: var(--bg-darker);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    
+    .container {
+      padding: 2rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 0;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .logo {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .user-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--primary);
+    }
+    
+    .user-name {
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    
+    .user-position {
+      font-size: 0.75rem;
+      color: var(--text-lighter);
+    }
+    
+    .btn {
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+    
+    .btn-primary:hover {
+      background: var(--primary-light);
+    }
+    
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--accent);
+    }
+    
+    .btn-outline:hover {
+      background: rgba(0, 247, 255, 0.1);
+    }
+    
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .page-title {
+      font-size: 1.75rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    
+    .cases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 1.5rem;
+    }
+    
+    .case-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s ease;
+      border: 1px solid var(--border);
+    }
+    
+    .case-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      background: var(--card-hover);
+      border-color: var(--primary);
+    }
+    
+    .case-id {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.5px;
+    }
+    
+    .case-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      color: var(--text);
+    }
+    
+    .case-description {
+      font-size: 0.95rem;
+      color: var(--text-light);
+      margin-bottom: 1.25rem;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    
+    .case-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+    
+    .case-tag {
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-weight: 500;
+      font-size: 0.75rem;
+    }
+    
+    .priority-high {
+      background-color: var(--danger);
+      color: white;
+    }
+    
+    .priority-medium {
+      background-color: var(--warning);
+      color: var(--bg-darker);
+    }
+    
+    .priority-low {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .status-open {
+      background-color: var(--info);
+      color: white;
+    }
+    
+    .status-in-progress {
+      background-color: var(--warning);
+      color: var(--bg-darker);
+    }
+    
+    .status-closed {
+      background-color: var(--success);
+      color: white;
+    }
+    
+    .case-date {
+      color: var(--text-lighter);
+      font-size: 0.8rem;
+    }
+    
+    .no-cases {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 3rem;
+      color: var(--text-lighter);
+      background: var(--card-bg);
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+    }
+    
+    /* Notification Styles */
+    .notification-bell {
+      position: relative;
+      cursor: pointer;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--card-bg);
+      border-radius: 50%;
+      transition: all 0.2s ease;
+    }
+    
+    .notification-bell:hover {
+      background: var(--secondary);
+    }
+    
+    .notification-badge {
+      position: absolute;
+      top: -2px;
+      right: -2px;
+      background-color: var(--danger);
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      font-weight: 600;
+      border: 2px solid var(--bg-darker);
+    }
+    
+    .notification-panel {
+      position: fixed;
+      top: 80px;
+      right: 2rem;
+      background: var(--secondary);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      width: 380px;
+      max-height: 500px;
+      overflow-y: auto;
+      z-index: 1000;
+      display: none;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform-origin: top right;
+    }
+    
+    .notification-header {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      background: var(--secondary);
+      z-index: 1;
+    }
+    
+    .notification-title {
+      font-weight: 600;
+      font-size: 1.1rem;
+    }
+    
+    .notification-clear {
+      background: none;
+      border: none;
+      color: var(--accent);
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+    
+    .notification-item {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    
+    .notification-item:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    
+    .notification-item.unread {
+      background: rgba(0, 247, 255, 0.08);
+      border-left: 3px solid var(--accent);
+    }
+    
+    .notification-item-title {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .notification-item-message {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+    }
+    
+    .notification-item-time {
+      font-size: 0.75rem;
+      color: var(--text-lighter);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    
+    .notification-item-time::before {
+      content: "🕒";
+      font-size: 0.7rem;
+    }
+    
+    /* Animation for new notification */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    
+    .pulse {
+      animation: pulse 0.5s ease-in-out;
+    }
+    
+    /* Audio element (hidden) */
+    #notification-sound {
+      display: none;
+    }
+    
+    /* Responsive adjustments */
+    @media (max-width: 1024px) {
+      .cases-grid {
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        padding: 1.5rem;
+      }
+      
+      .cases-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .notification-panel {
+        width: 320px;
+        right: 1rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .container {
+        padding: 1rem;
+      }
+      
+      .user-name {
+        display: none;
+      }
+      
+      .notification-panel {
+        width: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Audio element for notification sound -->
+<audio id="notification-sound" src="mixkit-software-interface-start-2574.wav" preload="auto"></audio>
+
+<div class="container">
+  <header>
+    <div class="logo">
+      CENTRALIZED CASE MANAGEMENT SYSTEM
+      
+    </div>
+    
+    <div class="user-actions">
+      <div class="notification-bell" id="notification-bell">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+         <path d="M18 8C18 6.4087 17.3679 4.88258 16.2426 3.75736C15.1174 2.63214 13.5913 2 12 2C10.4087 2 8.88258 2.63214 7.75736 3.75736C6.63214 4.88258 6 6.4087 6 8C6 15 3 17 3 17H21C21 17 18 15 18 8Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13.73  21C13.5542 21.3031 13.3019 21.5547 12.9982 21.7295C12.6946 21.9044 12.3504 21.9965 12 21.9965C11.6496 21.9965 11.3054 21.9044 11.0018 21.7295C10.6981 21.5547 10.4458 21.3031 10.27 21" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <span class="notification-badge" id="notification-badge" style="display:none;">0</span>
+      </div>
+      
+      <div class="user-info">
+        <img id="user-avatar" class="user-avatar" src="PROFILE.avif" alt="User" />
+        <div>
+          <div id="user-name" class="user-name">Loading...</div>
+          <div id="user-position" class="user-position">Officer</div>
+        </div>
+      </div>
+      
+      <button class="btn btn-outline" id="logout-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M9 21H5C4.46957 21 3.96086 20.7893 3.58579 20.4142C3.21071 20.0391 3 19.5304 3 19V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M16 17L21 12L16 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M21 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Logout
+      </button>
+    </div>
+  </header>
+  
+  <!-- Notification panel (hidden by default) -->
+  <div class="notification-panel" id="notification-panel">
+    <div class="notification-header">
+      <div class="notification-title">Notifications</div>
+      <button class="notification-clear" id="clear-notifications">Clear All</button>
+    </div>
+    <div id="notifications-list"></div>
+  </div>
+  
+  <div class="page-header">
+    <h1 class="page-title">CASES</h1>
+    <div class="case-count" id="case-count">0 cases</div>
+  </div>
+  
+  <div class="cases-grid" id="cases-container">
+    <!-- Cases will be dynamically inserted here -->
+    <div class="no-cases">Loading your cases...</div>
+  </div>
+</div>
+
+<script type="module">
+  // Import Firebase modules
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { 
+    getFirestore, 
+    collection, 
+    query, 
+    where, 
+    getDocs,
+    doc,
+    getDoc,
+    onSnapshot
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { 
+    getAuth, 
+    onAuthStateChanged, 
+    signOut 
+  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {  
+    apiKey: "AIzaSyC1bCHfPCiBpLXNdLev0TMkGGuAkqQywbQ",
+    authDomain: "trace-601a4.firebaseapp.com",
+    projectId: "trace-601a4",
+    storageBucket: "trace-601a4.appspot.com",
+    messagingSenderId: "492652025922",
+    appId: "1:492652025922:web:935b8e7efe06be845ab5db",
+    measurementId: "G-89T9DRMKZL"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const auth = getAuth();
+
+  // Notification variables
+  let notifications = [];
+  let currentUserId = null;
+  let userPosition = null;
+  let caseCount = 0;
+
+  // DOM elements
+  const notificationBell = document.getElementById('notification-bell');
+  const notificationBadge = document.getElementById('notification-badge');
+  const notificationPanel = document.getElementById('notification-panel');
+  const notificationsList = document.getElementById('notifications-list');
+  const clearNotificationsBtn = document.getElementById('clear-notifications');
+  const notificationSound = document.getElementById('notification-sound');
+  const caseCountElement = document.getElementById('case-count');
+
+  // Toggle notification panel
+  notificationBell.addEventListener('click', (e) => {
+    e.stopPropagation();
+    notificationPanel.style.display = notificationPanel.style.display === 'block' ? 'none' : 'block';
+    
+    // Mark all as read when opening
+    if (notificationPanel.style.display === 'block') {
+      markAllNotificationsAsRead();
+    }
+  });
+
+  // Close notification panel when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!notificationPanel.contains(e.target) && e.target !== notificationBell) {
+      notificationPanel.style.display = 'none';
+    }
+  });
+
+  // Clear all notifications
+  clearNotificationsBtn.addEventListener('click', () => {
+    notifications = [];
+    renderNotifications();
+    notificationBadge.style.display = 'none';
+  });
+
+  // Check authentication state
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      currentUserId = user.uid;
+      document.getElementById('user-name').textContent = user.displayName || user.email;
+      
+      // Get user data from Firestore
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+      
+      if (userSnap.exists()) {
+        const userData = userSnap.data();
+        userPosition = userData.position;
+        document.getElementById('user-position').textContent = formatPosition(userPosition);
+        
+        // Fetch cases where this user is assigned
+        await fetchUserCases(user.uid, userPosition);
+        
+        // Set up real-time listener for new cases
+        setupCaseListener(user.uid, userPosition);
+      } else {
+        console.error("No user data found in Firestore");
+        document.getElementById('cases-container').innerHTML = `
+          <div class="no-cases">Error loading your cases. Please try again.</div>
+        `;
+      }
+    } else {
+      // User is signed out, redirect to login
+      window.location.href = "login.html";
+    }
+  });
+
+  // Logout button handler
+  document.getElementById('logout-btn').addEventListener('click', () => {
+    signOut(auth).then(() => {
+      window.location.href = "index.html";
+    }).catch((error) => {
+      console.error("Logout error:", error);
+    });
+  });
+
+  function formatPosition(position) {
+    const positions = {
+      officer: "Officer",
+      inspector: "Inspector",
+      hawaldar: "Hawaldar",
+      forensics_expert: "Forensics Expert",
+      ballistics_expert: "Ballistics Expert"
+    };
+    return positions[position] || position;
+  }
+
+  async function fetchUserCases(userId, userPosition) {
+    try {
+      const casesRef = collection(db, "cases");
+      let fieldToQuery = getFieldForPosition(userPosition);
+      
+      if (!fieldToQuery) {
+        document.getElementById('cases-container').innerHTML = `
+          <div class="no-cases">Your position doesn't have assigned cases.</div>
+        `;
+        return;
+      }
+      
+      // Query cases where this user is assigned in their position field
+      const q = query(casesRef, where(fieldToQuery, "==", userId));
+      const querySnapshot = await getDocs(q);
+      
+      caseCount = querySnapshot.size;
+      updateCaseCount();
+      
+      if (querySnapshot.empty) {
+        document.getElementById('cases-container').innerHTML = `
+          <div class="no-cases">No cases assigned to you yet.</div>
+        `;
+        return;
+      }
+      
+      // Process and display cases
+      const casesContainer = document.getElementById('cases-container');
+      casesContainer.innerHTML = '';
+      
+      querySnapshot.forEach((doc) => {
+        const caseData = doc.data();
+        const caseCard = createCaseCard(caseData);
+        casesContainer.appendChild(caseCard);
+      });
+      
+    } catch (error) {
+      console.error("Error fetching cases:", error);
+      document.getElementById('cases-container').innerHTML = `
+        <div class="no-cases">Error loading your cases. Please try again.</div>
+      `;
+    }
+  }
+
+  function setupCaseListener(userId, userPosition) {
+    const fieldToQuery = getFieldForPosition(userPosition);
+    if (!fieldToQuery) return;
+    
+    const casesRef = collection(db, "cases");
+    const q = query(casesRef, where(fieldToQuery, "==", userId));
+    
+    // Set up real-time listener
+    onSnapshot(q, (snapshot) => {
+      caseCount = snapshot.size;
+      updateCaseCount();
+      
+      snapshot.docChanges().forEach((change) => {
+        if (change.type === "added") {
+          // This is a new case assignment
+          const caseData = change.doc.data();
+          
+          // Create notification
+          const newNotification = {
+            id: Date.now(),
+            caseId: caseData.caseId,
+            title: `New case assigned: ${caseData.title}`,
+            message: `You've been assigned to case ${caseData.caseId} - ${caseData.priority} priority`,
+            timestamp: new Date(),
+            read: false,
+            caseData: caseData
+          };
+          
+          // Add to notifications array
+          notifications.unshift(newNotification);
+          
+          // Update UI
+          renderNotifications();
+          
+          // Play sound and show badge
+          notificationSound.play();
+          notificationBadge.textContent = getUnreadCount();
+          notificationBadge.style.display = 'block';
+          notificationBell.classList.add('pulse');
+          setTimeout(() => notificationBell.classList.remove('pulse'), 500);
+          
+          // Add the new case to the cases grid
+          const caseCard = createCaseCard(caseData);
+          document.getElementById('cases-container').prepend(caseCard);
+        }
+      });
+    });
+  }
+
+  function updateCaseCount() {
+    caseCountElement.textContent = `${caseCount} ${caseCount === 1 ? 'case' : 'cases'}`;
+  }
+
+  function getFieldForPosition(position) {
+    switch(position) {
+      case "officer": return "assignedOfficer";
+      case "inspector": return "assignedInspector";
+      case "hawaldar": return "assignedHawaldar";
+      case "forensics_expert": return "forensicsExpert";
+      case "ballistics_expert": return "ballisticsExpert";
+      default: return null;
+    }
+  }
+
+function renderNotifications(newNotification = null) {
+  notificationsList.innerHTML = '';
+  
+  if (notifications.length === 0) {
+    notificationsList.innerHTML = '<div class="notification-item">No notifications</div>';
+    notificationBadge.style.display = 'none';
+    return;
+  }
+
+  if (newNotification) {
+    // Play notification sound only for new notifications
+    const notificationSound = document.getElementById('notification-sound');
+    notificationSound.play();
+  }
+
+  notifications.forEach(notification => {
+    const notificationItem = document.createElement('div');
+    notificationItem.className = `notification-item ${notification.read ? '' : 'unread'}`;
+    notificationItem.innerHTML = `
+      <div class="notification-item-title">${notification.title}</div>
+      <div class="notification-item-message">${notification.message}</div>
+      <div class="notification-item-time">${formatTime(notification.timestamp)}</div>
+    `;
+    
+    notificationItem.addEventListener('click', () => {
+      notification.read = true;
+      renderNotifications();
+      notificationBadge.textContent = getUnreadCount();
+      
+      if (getUnreadCount() === 0) {
+        notificationBadge.style.display = 'none';
+      }
+
+      // Optional: Navigate to the case details (uncomment if needed)
+      // window.location.href = `case_details.html?id=${notification.caseData?.caseId}`;
+    });
+    
+    notificationsList.appendChild(notificationItem);
+  });
+
+  notificationBadge.textContent = getUnreadCount();
+  notificationBadge.style.display = getUnreadCount() > 0 ? 'inline-block' : 'none';
+}
+
+function markAllNotificationsAsRead() {
+  notifications.forEach(notification => {
+    notification.read = true;
+  });
+  renderNotifications();
+  notificationBadge.style.display = 'none';
+}
+
+function getUnreadCount() {
+  return notifications.filter(n => !n.read).length;
+}
+
+
+  function formatTime(date) {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - new Date(date)) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} min ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    
+    return new Date(date).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+
+  function createCaseCard(caseData) {
+    const card = document.createElement('div');
+    card.className = 'case-card';
+    
+    // Get priority class
+    let priorityClass = '';
+    if (caseData.priority === 'High') priorityClass = 'priority-high';
+    else if (caseData.priority === 'Medium') priorityClass = 'priority-medium';
+    else if (caseData.priority === 'Low') priorityClass = 'priority-low';
+    
+    // Get status class
+    let statusClass = '';
+    if (caseData.status === 'Open') statusClass = 'status-open';
+    else if (caseData.status === 'In Progress') statusClass = 'status-in-progress';
+    else if (caseData.status === 'Closed') statusClass = 'status-closed';
+    
+    // Format date
+    const createdAt = caseData.createdAt?.toDate() || new Date();
+    const formattedDate = createdAt.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    });
+    
+    card.innerHTML = `
+      <div class="case-id">${caseData.caseId}</div>
+      <h3 class="case-title">${caseData.title}</h3>
+      <p class="case-description">${caseData.description}</p>
+      <div class="case-meta">
+        <span class="case-tag ${priorityClass}">${caseData.priority}</span>
+        <span class="case-tag ${statusClass}">${caseData.status}</span>
+        <span class="case-date">${formattedDate}</span>
+      </div>
+    `;
+    
+    // Make card clickable to view case details
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', () => {
+      window.location.href = `case_details.html?id=${caseData.caseId}`;
+    });
+    
+    return card;
+  }
+
+  
+</script>
+
+</body>
+</html>

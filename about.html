@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TRACE - Tactical Real-Time Analysis of Criminal Events</title>
+  <link rel="icon" href="your_emblem_here.png" type="image/png">
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary-color: #0a1931;
+      --accent-color: #f0c808;
+      --text-color: #ffffff;
+      --background-color: #ffffff;
+      --dark-background: #0a1931;
+      --dark-card: #13274f;
+      --dark-text: #f0f0f0;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--background-color);
+      color: var(--primary-color);
+      transition: background-color 0.5s, color 0.5s;
+      scroll-behavior: smooth;
+    }
+    .top-bar, .main-bar, .nav-bar, .dashboard, .dashboard-card, .info-section {
+      transition: background-color 0.5s, color 0.5s;
+    }
+    .top-bar, .main-bar, .nav-bar {
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .dashboard {
+      padding: 30px 20px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      background-color: #f7f7f7;
+    }
+    .dashboard-card, .info-section {
+      background: #ffffff;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    .top-bar {
+      background-color: #ffffff;
+      font-size: 0.9rem;
+      border-bottom: 1px solid lightgrey;
+    }
+    .top-bar div {
+      display: flex;
+      align-items: center;
+    }
+    .vertical-line {
+      border-left: 1px solid grey;
+      height: 15px;
+      margin: 0 10px;
+    }
+    .main-bar {
+      background-color: #ffffff;
+      border-bottom: 1px solid lightgrey;
+    }
+    .main-bar img {
+      height: 50px;
+      margin-right: 15px;
+    }
+    .main-bar-title {
+      font-weight: bold;
+      font-size: 1.5rem;
+      color: var(--primary-color);
+    }
+    .main-bar-buttons button {
+      margin-left: 15px;
+      padding: 8px 15px;
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+    .main-bar-buttons button:hover {
+      background-color: var(--accent-color);
+      color: var(--primary-color);
+    }
+    .nav-bar {
+      background-color: var(--primary-color);
+    }
+    .nav-links a {
+      color: var(--text-color);
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    .nav-links a:hover {
+      text-decoration: underline;
+    }
+    .search-bar input {
+      padding: 5px 10px;
+      border-radius: 5px;
+      border: none;
+      margin-left: 20px;
+    }
+    select {
+      margin-top: 10px;
+      padding: 8px 15px;
+      font-size: 1rem;
+      border-radius: 5px;
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      transition: background-color 0.5s, color 0.5s;
+    }
+    footer {
+      background-color: var(--primary-color);
+      color: var(--text-color);
+      text-align: center;
+      padding: 15px;
+      font-size: 0.9rem;
+    }
+    .toggle-btn {
+      background: none;
+      border: 2px solid var(--primary-color);
+      color: var(--primary-color);
+      padding: 5px 10px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+   
+    .crime-map {
+      width: 100%;
+      height: 400px;
+      margin-top: 20px;
+    }
+    
+.dashboard-card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-card h2 {
+  font-size: 24px;
+  color: #333;
+}
+
+.dashboard-card p {
+  font-size: 16px;
+  color: #666;
+}
+
+.dashboard-card select {
+  padding: 10px;
+  width: 100%;
+  font-size: 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+
+.timestamp {
+  color: #bbb;
+  margin-right: 8px;
+}
+/* SEARCH BAR STYLES */
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 5px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.search-bar input {
+  padding: 8px 15px;
+  border: none;
+  outline: none;
+  width: 200px;
+  font-size: 14px;
+}
+
+.search-bar button {
+  padding: 8px 12px;
+  border: none;
+  background: #f0c808;
+  color: #0a1931;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.search-bar button:hover {
+  background: #e0b700;
+}
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  right: 20px;
+  width: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: white;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 1000;
+  display: none;
+  margin-top: 5px;
+}
+
+.search-result-item {
+  padding: 10px 15px;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+}
+
+.search-result-item:hover {
+  background: #f5f5f5;
+}
+
+.search-result-item h4 {
+  margin: 0 0 5px 0;
+  color: #0a1931;
+}
+
+.search-result-item p {
+  margin: 0;
+  color: #666;
+  font-size: 13px;
+}
+
+.highlight {
+  background-color: yellow;
+  color: black;
+  padding: 0 2px;
+}
+
+.no-results {
+  padding: 15px;
+  text-align: center;
+  color: #666;
+}
+
+.clear-search {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  background: #f0f0f0;
+  border: none;
+  border-top: 1px solid #eee;
+  cursor: pointer;
+  text-align: center;
+  color: #0a1931;
+}
+
+.clear-search:hover {
+  background: #e0e0e0;
+}
+
+</style>
+
+
+  </style>
+</head>
+
+<body>
+
+<!-- Top Bar -->
+<div class="top-bar">
+  <div>
+    <span>Government of India</span>
+    <div class="vertical-line"></div>
+    <span>Ministry of Home Affairs</span>
+  </div>
+  
+</div>
+
+<!-- Main Bar -->
+<div class="main-bar">
+  <div style="display:flex; align-items:center;">
+    <img src="Picture1.png" alt="Main Logo">
+    <span class="main-bar-title">TACTICAL REAL TIME ANALYSIS OF CRIMINAL EVENTS</span>
+  </div>
+  <div class="main-bar-buttons">
+    <button onclick="goTo('USER_CASE_DETAILS.html')">Cases</button>
+    <button onclick="goTo('FORENSICS.html')">Forensics</button>
+    <button onclick="goTo('BALLISTICS.html')">Ballistics</button>
+    <button onclick="goTo('TRACE_LOGIN.html')">Logout</button>
+    
+        
+    </button>
+</div>
+
+  </div>
+</div>
+
+<!-- Nav Bar -->
+<div class="nav-bar">
+  <div class="nav-links">
+    <a href="HOME.html">Home</a>
+  
+  
+    
+  </div>
+  <div class="search-container">
+  <div class="search-bar">
+    <input type="text" id="globalSearchInput" placeholder="Search">
+    <button id="searchButton">
+      <i class="fas fa-search"></i>
+    </button>
+  </div>
+  <div class="search-results" id="searchResults">
+    <!-- Results will appear here -->
+  </div>
+</div>
+</div>
+
+<!-- ABOUT TRACE SECTION -->
+<section class="info-section">
+    <h2>About TRACE</h2>
+    <p>
+      TRACE (Tactical Real-time Analysis of Criminal Events) is an initiative under the Ministry of Home Affairs, Government of India, aimed at modernizing criminal investigation through data-driven insights, real-time tracking, and forensic analysis. TRACE integrates national crime records, live incident feeds, cybercrime investigation modules, and ballistics forensics into a centralized dashboard for rapid and tactical decision-making. With TRACE, investigative agencies are empowered with automated analytics, inter-agency coordination tools, and live crime heatmaps, helping reduce response time and increasing conviction rates effectively across the nation.
+    </p>
+    <h3>National Crime Map</h3>
+    <p>Below is the crime distribution across India, showcasing crime hotspots and crime rate per state:</p>
+    <img src="CRIME_MAP.avif" alt="National Crime Map" class="crime-map">
+    
+    <style>
+      .crime-map {
+        max-width: 100%; /* Ensures the image resizes according to the container */
+        height: auto; /* Maintains aspect ratio */
+        display: block; /* Removes any potential spacing below the image */
+        margin: 0 auto; /* Centers the image horizontally */
+      }
+    </style>
+    </section>    
+  <!-- SERVICES SECTION -->
+  <section class="info-section">
+    <h2>Services Provided by TRACE</h2>
+    <ul>
+      <li><strong>Real-Time Crime Monitoring:</strong> Live feed and alert generation for ongoing criminal activities across zones and states.</li>
+      <li><strong>Data Analytics:</strong> Predictive analysis and statistical breakdown of crime trends based on demographics, location, and type.</li>
+      <li><strong>Cyber Crime Investigation:</strong> Specialized portals for cyber offenses including digital forensics and evidence preservation.</li>
+      <li><strong>Ballistics Analysis:</strong> Integration with forensic labs for rapid ballistic matching and case linkage.</li>
+      <li><strong>Centralized Case Management:</strong> Single-window platform for managing ongoing, past, and reopened criminal cases.</li>
+      <li><strong>Forensics and DNA Matching:</strong> Advanced forensic services with AI-assisted DNA and fingerprint matching systems.</li>
+    </ul>
+  </section>
+
+
+
+
+<!-- FOOTER -->
+<footer>
+  © 2025 TRACE | Ministry of Home Affairs | All Activities are Monitored and Secured.
+</footer>
+
+<script>
+    function goTo(page) {
+        window.location.href = page;
+    }
+  // Add this script to your HOME page
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize search functionality
+    initSearch();
+    
+    function initSearch() {
+        const searchInput = document.getElementById('globalSearchInput');
+        const searchButton = document.getElementById('searchButton');
+        const searchResults = document.getElementById('searchResults');
+        
+        // Perform search function
+        function performSearch() {
+            const searchTerm = searchInput.value.trim();
+            if (searchTerm === '') {
+                clearSearch();
+                return;
+            }
+            
+            // Clear previous results and highlights
+            clearHighlights();
+            searchResults.innerHTML = '';
+            
+            // Search through all text content on the page
+            const textNodes = getTextNodes(document.body);
+            let results = [];
+            
+            textNodes.forEach(node => {
+                const content = node.nodeValue;
+                if (content.toLowerCase().includes(searchTerm.toLowerCase())) {
+                    const parentElement = getParentElement(node);
+                    if (parentElement && isVisible(parentElement)) {
+                        results.push({
+                            element: parentElement,
+                            content: content,
+                            matches: findMatches(content, searchTerm)
+                        });
+                    }
+                }
+            });
+            
+            // Display results
+            if (results.length > 0) {
+                results.forEach(result => {
+                    highlightMatches(result.element, result.matches);
+                    
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'search-result-item';
+                    resultItem.innerHTML = `
+                        <p>${highlightTextInPreview(result.content, result.matches)}</p>
+                    `;
+                    resultItem.addEventListener('click', () => {
+                        result.element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // Add extra highlight to the clicked result
+                        result.element.classList.add('search-highlight-focus');
+                        setTimeout(() => {
+                            result.element.classList.remove('search-highlight-focus');
+                        }, 2000);
+                    });
+                    searchResults.appendChild(resultItem);
+                });
+                
+                // Add clear button
+                const clearButton = document.createElement('button');
+                clearButton.className = 'clear-search';
+                clearButton.textContent = 'Clear Search';
+                clearButton.addEventListener('click', clearSearch);
+                searchResults.appendChild(clearButton);
+                
+                searchResults.style.display = 'block';
+            } else {
+                searchResults.innerHTML = '<div class="no-results">No results found for "' + searchTerm + '"</div>';
+                searchResults.style.display = 'block';
+            }
+        }
+        
+        // Helper functions
+        function getTextNodes(element) {
+            const walker = document.createTreeWalker(
+                element,
+                NodeFilter.SHOW_TEXT,
+                null,
+                false
+            );
+            
+            const textNodes = [];
+            let node;
+            while (node = walker.nextNode()) {
+                if (node.nodeValue.trim() !== '') {
+                    textNodes.push(node);
+                }
+            }
+            return textNodes;
+        }
+        
+        function getParentElement(node) {
+            let parent = node.parentNode;
+            while (parent && parent.nodeType === Node.ELEMENT_NODE) {
+                if (parent.tagName !== 'SCRIPT' && parent.tagName !== 'STYLE' && 
+                    !parent.classList.contains('search-result-item') && 
+                    !parent.classList.contains('search-results')) {
+                    return parent;
+                }
+                parent = parent.parentNode;
+            }
+            return null;
+        }
+        
+        function isVisible(element) {
+            return element.offsetWidth > 0 || element.offsetHeight > 0;
+        }
+        
+        function findMatches(text, searchTerm) {
+            const regex = new RegExp(searchTerm, 'gi');
+            const matches = [];
+            let match;
+            while ((match = regex.exec(text)) !== null) {
+                matches.push({
+                    start: match.index,
+                    end: match.index + match[0].length,
+                    text: match[0]
+                });
+            }
+            return matches;
+        }
+        
+        function highlightMatches(element, matches) {
+            if (!element || matches.length === 0) return;
+            
+            const content = element.textContent;
+            let html = content;
+            
+            // Process matches from end to start to avoid offset issues
+            matches.sort((a, b) => b.start - a.start);
+            
+            matches.forEach(match => {
+                const before = html.substring(0, match.start);
+                const highlighted = `<span class="highlight">${html.substring(match.start, match.end)}</span>`;
+                const after = html.substring(match.end);
+                html = before + highlighted + after;
+            });
+            
+            element.innerHTML = html;
+        }
+        
+        function highlightTextInPreview(text, matches) {
+            if (matches.length === 0) return text;
+            
+            // Show context around the first match
+            const firstMatch = matches[0];
+            const contextStart = Math.max(0, firstMatch.start - 20);
+            const contextEnd = Math.min(text.length, firstMatch.end + 20);
+            let preview = text.substring(contextStart, contextEnd);
+            
+            if (contextStart > 0) preview = '...' + preview;
+            if (contextEnd < text.length) preview = preview + '...';
+            
+            // Highlight all matches in the preview
+            matches.forEach(match => {
+                const adjustedStart = match.start - contextStart + (contextStart > 0 ? 3 : 0);
+                const adjustedEnd = match.end - contextStart + (contextStart > 0 ? 3 : 0);
+                
+                if (adjustedStart >= 0 && adjustedEnd <= preview.length) {
+                    const before = preview.substring(0, adjustedStart);
+                    const highlighted = `<span class="highlight">${preview.substring(adjustedStart, adjustedEnd)}</span>`;
+                    const after = preview.substring(adjustedEnd);
+                    preview = before + highlighted + after;
+                }
+            });
+            
+            return preview;
+        }
+        
+        function clearHighlights() {
+            document.querySelectorAll('.highlight').forEach(highlight => {
+                const parent = highlight.parentNode;
+                parent.textContent = parent.textContent;
+                parent.normalize();
+            });
+        }
+        
+        function clearSearch() {
+            clearHighlights();
+            searchInput.value = '';
+            searchResults.style.display = 'none';
+            searchResults.innerHTML = '';
+        }
+        
+        // Event listeners
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Close results when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-container')) {
+                searchResults.style.display = 'none';
+            }
+        });
+    }
+    
+    // Add Font Awesome if not already loaded
+    if (!document.querySelector('link[href*="font-awesome"]')) {
+        const faLink = document.createElement('link');
+        faLink.rel = 'stylesheet';
+        faLink.href = 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css';
+        document.head.appendChild(faLink);
+    }
+    
+    // Add additional highlight style
+    const style = document.createElement('style');
+    style.textContent = `
+        .search-highlight-focus {
+            animation: highlight-pulse 2s;
+        }
+        @keyframes highlight-pulse {
+            0% { background-color: yellow; }
+            100% { background-color: transparent; }
+        }
+    `;
+    document.head.appendChild(style);
+});  
+</script>
+
+</body>
+</html>

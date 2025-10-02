@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TRACE | Create Account</title>
+  <link rel="icon" type="image/png" href="CENTRAL_GOVERNMENT.jpg">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body, html {
+      height: 100%;
+      background: #f5f5f5; /* Light mode default */
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dark-mode {
+      background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      width: 100%;
+      position: relative;
+      z-index: 1;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.6;
+      animation: float 10s infinite ease-in-out;
+      z-index: 0;
+      display: none; /* Hidden by default in light mode */
+    }
+
+    .dark-mode .blob {
+      display: block; /* Show in dark mode */
+    }
+
+    .blob1 {
+      top: 10%;
+      left: 10%;
+      width: 300px;
+      height: 300px;
+      background: #007BFF;
+    }
+
+    .blob2 {
+      bottom: 10%;
+      right: 10%;
+      width: 400px;
+      height: 400px;
+      background: #00f7ff;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      50% {
+        transform: translateY(20px) translateX(20px);
+      }
+    }
+
+    .form-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+    }
+
+    .signup-form {
+      background: rgba(255, 255, 255, 0.9); /* Light mode */
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 900px;
+      color: #333; /* Light mode text */
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+    }
+
+    .dark-mode .signup-form {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+      color: #fff;
+    }
+
+    .signup-form h2 {
+      margin-bottom: 20px;
+      color: #007BFF; /* Light mode */
+      text-align: center;
+      width: 100%;
+    }
+
+    .dark-mode .signup-form h2 {
+      color: #00f7ff;
+      text-shadow: 0 0 5px #00f7ff;
+    }
+
+    .input-box {
+      margin-bottom: 20px;
+      width: 48%;
+    }
+
+    .input-box input,
+    .input-box select,
+    .input-box textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.2); /* Light mode */
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.8); /* Light mode */
+      color: #333; /* Light mode */
+      outline: none;
+    }
+
+    .dark-mode .input-box input,
+    .dark-mode .input-box select,
+    .dark-mode .input-box textarea {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: #fff;
+    }
+
+    .input-box input::placeholder {
+      color: #888; /* Light mode */
+    }
+
+    .dark-mode .input-box input::placeholder {
+      color: #bbb;
+    }
+
+    .terms {
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      color: #666; /* Light mode */
+      width: 100%;
+    }
+
+    .dark-mode .terms {
+      color: #bbb;
+    }
+
+    .terms label {
+      display: flex;
+      align-items: center;
+    }
+
+    .terms input {
+      margin-right: 8px;
+    }
+
+    .terms a {
+      color: #007BFF; /* Light mode */
+      text-decoration: none;
+      margin-left: 4px;
+    }
+
+    .dark-mode .terms a {
+      color: #00f7ff;
+    }
+
+    .signup-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #007BFF, #0056d2); /* Light mode */
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dark-mode .signup-btn {
+      background: linear-gradient(90deg, #00f7ff, #007BFF);
+      color: #000;
+    }
+
+    .signup-btn:hover {
+      background: linear-gradient(90deg, #0056d2, #003d99);
+      color: #fff;
+    }
+
+    .dark-mode .signup-btn:hover {
+      background: linear-gradient(90deg, #007BFF, #0056d2);
+    }
+
+    .already-account {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 0.9rem;
+      color: #666; /* Light mode */
+      width: 100%;
+    }
+
+    .dark-mode .already-account {
+      color: #aaa;
+    }
+
+    .already-account a {
+      color: #007BFF; /* Light mode */
+      text-decoration: none;
+    }
+
+    .dark-mode .already-account a {
+      color: #00f7ff;
+    }
+
+    .already-account a:hover {
+      text-decoration: underline;
+    }
+
+    .status-message {
+      text-align: center;
+      font-size: 1rem;
+      margin-top: 20px;
+      width: 100%;
+    }
+
+    /* Dark mode toggle button */
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50px;
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .dark-mode-toggle {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-mode-toggle i {
+      font-size: 20px;
+      color: #333;
+    }
+
+    .dark-mode .dark-mode-toggle i {
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .signup-form {
+        flex-direction: column;
+      }
+      .input-box {
+        width: 100%;
+      }
+      .dark-mode-toggle {
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body class="">
+  <div class="dark-mode-toggle" id="darkModeToggle">
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <div class="container">
+    <div class="form-container">
+      <form class="signup-form" id="signup-form">
+        <h2>Create Your Account</h2>
+
+        <!-- Input fields -->
+        <div class="input-box">
+          <input type="text" id="firstName" placeholder="First Name" required>
+        </div>
+        <div class="input-box">
+          <input type="text" id="lastName" placeholder="Last Name" required>
+        </div>
+        <div class="input-box">
+          <input type="email" id="email" placeholder="Email Address" required>
+        </div>
+        <div class="input-box">
+          <input type="text" id="badgeId" placeholder="Badge ID" required>
+        </div>
+        <div class="input-box">
+          <input type="date" id="dob" required>
+        </div>
+        <div class="input-box">
+          <select id="sex" required>
+            <option value="" disabled selected>Sex</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <!-- Position dropdown -->
+        <div class="input-box">
+          <select id="position" required>
+            <option value="" disabled selected>Select Position</option>
+            <option value="officer">Officer</option>
+            <option value="inspector">Inspector</option>
+            <option value="hawaldar">Hawaldar</option>
+            <option value="forensics_expert">Forensics Expert</option>
+            <option value="ballistics_expert">Ballistics Expert</option>
+          </select>
+        </div>
+
+        <div class="input-box">
+          <input type="text" id="department" placeholder="Add Department" required>
+        </div>
+        <div class="input-box">
+          <input type="text" id="commissionedBy" placeholder="Commissioned By" required>
+        </div>
+        <div class="input-box">
+          <input type="date" id="joiningDate" required>
+        </div>
+        <div class="input-box">
+          <input type="tel" id="mobileNo" placeholder="Mobile No" required>
+        </div>
+        <div class="input-box">
+          <textarea id="address" placeholder="Address" required></textarea>
+        </div>
+
+        <!-- Role dropdown -->
+        <div class="input-box">
+          <select id="role" required>
+            <option value="" disabled selected>Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+
+        <!-- Admin Access Code -->
+        <div class="input-box">
+          <input type="password" id="adminCode" placeholder="Admin Access Code" required>
+        </div>
+
+        <!-- Password fields -->
+        <div class="input-box">
+          <input type="password" id="password" placeholder="Password" required>
+        </div>
+        <div class="input-box">
+          <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+        </div>
+
+        <!-- Terms and Conditions -->
+        <div class="terms">
+          <label>
+            <input type="checkbox" id="terms" required>
+            I agree to <a href="TERMS_CONDITIONS.html">terms & conditions</a>
+          </label>
+        </div>
+
+        <!-- Sign Up Button -->
+        <button type="submit" class="signup-btn">Sign Up</button>
+
+        <div class="already-account">
+          Already have an account? <a href="index.html">Login here</a>
+        </div>
+
+        <div class="status-message" id="status-message"></div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1bCHfPCiBpLXNdLev0TMkGGuAkqQywbQ",
+      authDomain: "trace-601a4.firebaseapp.com",
+      projectId: "trace-601a4",
+      storageBucket: "trace-601a4.appspot.com",
+      messagingSenderId: "492652025922",
+      appId: "1:492652025922:web:935b8e7efe06be845ab5db",
+      measurementId: "G-89T9DRMKZL",
+      databaseURL: "https://trace-601a4-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    // Set your admin access code here
+    const ADMIN_ACCESS_CODE = "SAHAVI";
+
+    const statusEl = document.getElementById("status-message");
+
+    function showStatus(msg, isError = false) {
+      statusEl.innerText = msg;
+      statusEl.style.color = isError ? "#ff4d4f" : "#4CAF50"; // Green for success in light mode
+    }
+
+    // Dark mode toggle functionality
+    document.addEventListener("DOMContentLoaded", () => {
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const body = document.body;
+      
+      // Check for saved user preference or use light mode as default
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+        statusEl.style.color = '#a4edba'; // Light green for success in dark mode
+      } else {
+        statusEl.style.color = '#4CAF50'; // Dark green for success in light mode
+      }
+      
+      darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDarkMode = body.classList.contains('dark-mode');
+        
+        if (isDarkMode) {
+          darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          localStorage.setItem('darkMode', 'enabled');
+          statusEl.style.color = '#a4edba';
+        } else {
+          darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          localStorage.setItem('darkMode', 'disabled');
+          statusEl.style.color = '#4CAF50';
+        }
+      });
+
+      // Form submission handler
+      document.getElementById("signup-form").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const pwd = document.getElementById("password").value;
+        const cpwd = document.getElementById("confirmPassword").value;
+        if (pwd !== cpwd) {
+          showStatus("❌ Passwords do not match", true);
+          return;
+        }
+
+        if (!document.getElementById("terms").checked) {
+          showStatus("❌ Please accept the terms & conditions", true);
+          return;
+        }
+
+        const adminCode = document.getElementById("adminCode").value;
+        if (adminCode !== ADMIN_ACCESS_CODE) {
+          showStatus("❌ Invalid Admin Access Code", true);
+          return;
+        }
+
+        const data = {
+          firstName:      document.getElementById("firstName").value.trim(),
+          lastName:       document.getElementById("lastName").value.trim(),
+          email:          document.getElementById("email").value.trim(),
+          badgeId:        document.getElementById("badgeId").value.trim(),
+          dob:            document.getElementById("dob").value,
+          sex:            document.getElementById("sex").value,
+          position:       document.getElementById("position").value.trim(),
+          department:     document.getElementById("department").value.trim(),
+          commissionedBy: document.getElementById("commissionedBy").value.trim(),
+          joiningDate:    document.getElementById("joiningDate").value,
+          mobileNo:       document.getElementById("mobileNo").value.trim(),
+          address:        document.getElementById("address").value.trim(),
+          role:           document.getElementById("role").value
+        };
+
+        try {
+          const cred = await createUserWithEmailAndPassword(auth, data.email, pwd);
+
+          // Store user in Firestore based on role (admin or user)
+          const userCollection = data.role === "admin" ? "admins" : "users";
+
+          await setDoc(doc(db, userCollection, cred.user.uid), {
+            ...data,
+            uid: cred.user.uid
+          });
+
+          showStatus("✅ Account created successfully!");
+
+          // Redirect to appropriate page based on role
+          setTimeout(() => {
+            if (data.role === "admin") {
+              window.location.href = "ADMIN_HOME.html";
+            } else {
+              window.location.href = "HOME.html";
+            }
+          }, 1500);
+        } catch (err) {
+          showStatus("❌ " + err.message, true);
+        }
+      });
+    });
+  </script>
+</body>
+</html>

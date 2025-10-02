@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TRACE | Crime Records</title>
+  <link rel="icon" type="image/png" href="CENTRAL_GOVERNMENT.jpg">
+  <style>
+    /* Styling for Crime Records Page */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+      background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      padding: 20px;
+    }
+
+    .heading {
+      text-align: center;
+      color: #00f7ff;
+      margin-bottom: 30px;
+      font-size: 1.5rem;
+    }
+
+    .records-table {
+      width: 100%;
+      max-width: 1200px;
+      margin-top: 20px;
+      border-collapse: collapse;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .records-table th, .records-table td {
+      padding: 12px;
+      text-align: left;
+      color: #fff;
+    }
+
+    .records-table th {
+      background: #007BFF;
+    }
+
+    .records-table tr:nth-child(even) {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .records-table tr:hover {
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .search-container {
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      width: 48%;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+      margin-bottom: 10px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 10px;
+      background: transparent;
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+    }
+
+    .search-box select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      border-radius: 8px;
+    }
+
+    .search-box button {
+      background: #00f7ff;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .search-box button:hover {
+      background: #007BFF;
+      color: #fff;
+    }
+
+    .filter-container {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      max-width: 1200px;
+      margin-bottom: 20px;
+    }
+
+    .filter-box {
+      width: 23%;
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 8px;
+    }
+
+    .filter-box select {
+      width: 100%;
+      padding: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      border: none;
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      border-radius: 8px;
+    }
+
+    .filter-box button {
+      background: #00f7ff;
+      color: #000;
+      padding: 10px 20px;
+      border-radius: 8px;
+      margin-left: 8px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+      white-space: nowrap;
+    }
+
+    .filter-box button:hover {
+      background: #007BFF;
+      color: #fff;
+    }
+
+    .pagination {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .pagination button {
+      padding: 10px;
+      margin: 0 5px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .pagination button:hover {
+      background: #00f7ff;
+    }
+
+    .pagination .active {
+      background: #00f7ff;
+      color: #000;
+    }
+
+    .reset-btn {
+      background: #ff3b30 !important;
+      color: white !important;
+    }
+
+    .reset-btn:hover {
+      background: #d32f2f !important;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="heading">
+      <h1>CENTRALIZED CRIME RECORDS SYSTEM</h1>
+    </div>
+
+    <!-- Search Section -->
+    <div class="search-container">
+      <div class="search-box">
+        <input type="text" id="search-case" placeholder="Search by Case Title..." />
+        <button id="search-btn">Search</button>
+      </div>
+
+      <div class="search-box">
+        <input type="text" id="search-officer" placeholder="Search by Officer..." />
+        <button id="search-btn-officer">Search</button>
+      </div>
+    </div>
+
+    <!-- Filter Section -->
+    <div class="filter-container">
+      <div class="filter-box">
+        <select id="filter-case-id">
+          <option value="">Filter by Case ID</option>
+          <option value="all">All Cases</option>
+          <!-- Options will be populated dynamically -->
+        </select>
+        <button id="filter-btn-case-id">Filter</button>
+      </div>
+
+      <div class="filter-box">
+        <select id="filter-status">
+          <option value="">Filter by Status</option>
+          <option value="all">All Statuses</option>
+          <option value="Open">Open</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Closed">Closed</option>
+         
+        </select>
+        <button id="filter-btn-status">Filter</button>
+      </div>
+
+      <div class="filter-box">
+        <select id="filter-priority">
+          <option value="">Filter by Priority</option>
+          <option value="all">All Priorities</option>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+          
+        </select>
+        <button id="filter-btn-priority">Filter</button>
+      </div>
+
+      <div class="filter-box">
+        <button id="reset-filters" class="reset-btn">Reset All Filters</button>
+      </div>
+    </div>
+
+    <!-- Crime Records Table -->
+    <table class="records-table" id="records-table">
+      <thead>
+        <tr>
+          <th>Case ID</th>
+          <th>Case Title</th>
+          <th>Officer Assigned</th>
+          <th>Priority</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="records-body">
+        <!-- Data rows will be populated dynamically here -->
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" id="pagination">
+      <!-- Pagination buttons will be populated dynamically here -->
+    </div>
+
+  </div>
+
+  <!-- Firebase & JavaScript Logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, where, limit, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1bCHfPCiBpLXNdLev0TMkGGuAkqQywbQ",
+      authDomain: "trace-601a4.firebaseapp.com",
+      projectId: "trace-601a4",
+      storageBucket: "trace-601a4.appspot.com",
+      messagingSenderId: "492652025922",
+      appId: "1:492652025922:web:935b8e7efe06be845ab5db",
+      measurementId: "G-89T9DRMKZL"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const recordsPerPage = 10; // Set the number of records per page
+    let currentPage = 1;
+    let allRecords = []; // To store all records for filtering
+    let filteredRecords = []; // To store filtered records
+
+    // DOM elements
+    const caseIdFilter = document.getElementById('filter-case-id');
+    const statusFilter = document.getElementById('filter-status');
+    const priorityFilter = document.getElementById('filter-priority');
+
+    async function fetchRecords() {
+      const caseRef = collection(db, "cases");
+      const q = query(caseRef, orderBy("caseId")); // Order by caseId for consistency
+      const querySnapshot = await getDocs(q);
+      allRecords = querySnapshot.docs.map(doc => doc.data());
+      filteredRecords = [...allRecords];
+      
+      // Populate Case ID filter dropdown
+      populateCaseIdFilter();
+      
+      displayRecords(filteredRecords);
+      updatePagination();
+    }
+
+    function populateCaseIdFilter() {
+      caseIdFilter.innerHTML = '<option value="">Filter by Case ID</option><option value="all">All Cases</option>';
+      
+      // Get unique case IDs
+      const uniqueCaseIds = [...new Set(allRecords.map(record => record.caseId))];
+      
+      uniqueCaseIds.forEach(caseId => {
+        const option = document.createElement('option');
+        option.value = caseId;
+        option.textContent = caseId;
+        caseIdFilter.appendChild(option);
+      });
+    }
+
+    function displayRecords(records) {
+      const recordsBody = document.getElementById("records-body");
+      recordsBody.innerHTML = ''; // Clear the table before appending new records
+      
+      // Calculate pagination
+      const startIndex = (currentPage - 1) * recordsPerPage;
+      const endIndex = startIndex + recordsPerPage;
+      const paginatedRecords = records.slice(startIndex, endIndex);
+      
+      if (paginatedRecords.length === 0) {
+        const tr = document.createElement('tr');
+        tr.innerHTML = '<td colspan="5" style="text-align: center;">No records found</td>';
+        recordsBody.appendChild(tr);
+        return;
+      }
+      
+      paginatedRecords.forEach(record => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${record.caseId}</td>
+          <td>${record.title}</td>
+          <td>${record.assignedOfficer}</td>
+          <td>${record.priority}</td>
+          <td>${record.status}</td>
+        `;
+        recordsBody.appendChild(tr);
+      });
+    }
+
+    function updatePagination() {
+      const paginationDiv = document.getElementById('pagination');
+      paginationDiv.innerHTML = '';
+      
+      const totalPages = Math.ceil(filteredRecords.length / recordsPerPage);
+      
+      if (totalPages <= 1) return;
+      
+      // Previous button
+      const prevButton = document.createElement('button');
+      prevButton.textContent = 'Previous';
+      prevButton.disabled = currentPage === 1;
+      prevButton.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          displayRecords(filteredRecords);
+          updatePagination();
+        }
+      });
+      paginationDiv.appendChild(prevButton);
+      
+      // Page buttons
+      for (let i = 1; i <= totalPages; i++) {
+        const pageButton = document.createElement('button');
+        pageButton.textContent = i;
+        if (i === currentPage) {
+          pageButton.classList.add('active');
+        }
+        pageButton.addEventListener('click', () => {
+          currentPage = i;
+          displayRecords(filteredRecords);
+          updatePagination();
+        });
+        paginationDiv.appendChild(pageButton);
+      }
+      
+      // Next button
+      const nextButton = document.createElement('button');
+      nextButton.textContent = 'Next';
+      nextButton.disabled = currentPage === totalPages;
+      nextButton.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+          currentPage++;
+          displayRecords(filteredRecords);
+          updatePagination();
+        }
+      });
+      paginationDiv.appendChild(nextButton);
+    }
+
+    function applyFilters() {
+      const caseIdValue = caseIdFilter.value;
+      const statusValue = statusFilter.value;
+      const priorityValue = priorityFilter.value;
+      
+      filteredRecords = allRecords.filter(record => {
+        // Case ID filter
+        if (caseIdValue && caseIdValue !== 'all' && record.caseId !== caseIdValue) {
+          return false;
+        }
+        
+        // Status filter
+        if (statusValue && statusValue !== 'all' && record.status !== statusValue) {
+          return false;
+        }
+        
+        // Priority filter
+        if (priorityValue && priorityValue !== 'all' && record.priority !== priorityValue) {
+          return false;
+        }
+        
+        return true;
+      });
+      
+      currentPage = 1; // Reset to first page when filters change
+      displayRecords(filteredRecords);
+      updatePagination();
+    }
+
+    // Event listeners
+    document.getElementById("search-btn").addEventListener("click", async () => {
+      const caseTitle = document.getElementById("search-case").value.trim().toLowerCase();
+      if (!caseTitle) {
+        filteredRecords = [...allRecords];
+      } else {
+        filteredRecords = allRecords.filter(record => 
+          record.title.toLowerCase().includes(caseTitle)
+        );
+      }
+      currentPage = 1;
+      displayRecords(filteredRecords);
+      updatePagination();
+    });
+
+    document.getElementById("search-btn-officer").addEventListener("click", async () => {
+      const officerName = document.getElementById("search-officer").value.trim().toLowerCase();
+      if (!officerName) {
+        filteredRecords = [...allRecords];
+      } else {
+        filteredRecords = allRecords.filter(record => 
+          record.assignedOfficer.toLowerCase().includes(officerName)
+        );
+      }
+      currentPage = 1;
+      displayRecords(filteredRecords);
+      updatePagination();
+    });
+
+    document.getElementById("filter-btn-case-id").addEventListener("click", applyFilters);
+    document.getElementById("filter-btn-status").addEventListener("click", applyFilters);
+    document.getElementById("filter-btn-priority").addEventListener("click", applyFilters);
+
+    document.getElementById("reset-filters").addEventListener("click", () => {
+      // Reset all filter dropdowns
+      caseIdFilter.value = '';
+      statusFilter.value = '';
+      priorityFilter.value = '';
+      
+      // Reset search inputs
+      document.getElementById("search-case").value = '';
+      document.getElementById("search-officer").value = '';
+      
+      // Show all records
+      filteredRecords = [...allRecords];
+      currentPage = 1;
+      displayRecords(filteredRecords);
+      updatePagination();
+    });
+
+    // Initial fetch of records
+    fetchRecords();
+  </script>
+
+</body>
+</html>

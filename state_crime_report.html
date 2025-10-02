@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>State Crime Report</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <!-- Chart.js -->
+  <style>
+    body { font-family: 'Arial', sans-serif; padding: 20px; background-color: #f3f4f6; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .controls {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    canvas {
+      max-width: 800px;
+      margin: 20px auto;
+      display: block;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    button, select {
+      margin: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      cursor: pointer;
+      background-color: #3b82f6;
+      color: white;
+      transition: 0.3s;
+    }
+    button:hover, select:hover {
+      background-color: #2563eb;
+    }
+    table {
+      width: 80%;
+      margin: 30px auto 0;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 12px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #3b82f6;
+      color: white;
+    }
+    tr:hover { background-color: #f1f5f9; }
+    .table-controls {
+      text-align: center;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1 id="stateName"></h1>
+
+<div class="controls">
+  <button onclick="goBack()">🔙 Back</button>
+  <button onclick="downloadCSV()">⬇️ Download CSV</button>
+  <button onclick="printReport()">🖨️ Print Report</button>
+</div>
+
+<!-- Display Three Types of Graphs: Bar, Pie, Line -->
+<canvas id="barChart"></canvas>
+<canvas id="pieChart"></canvas>
+<canvas id="lineChart"></canvas>
+
+<div id="crimeTableContainer"></div>
+
+<script>
+  const crimeData = {
+    "andhra-pradesh": { Murder: 110, Robbery: 250, Theft: 430, Assault: 210 },
+    "arunachal-pradesh": { Murder: 25, Robbery: 45, Theft: 70, Assault: 30 },
+    "assam": { Murder: 130, Robbery: 260, Theft: 480, Assault: 220 },
+    "bihar": { Murder: 210, Robbery: 470, Theft: 700, Assault: 350 },
+    "chhattisgarh": { Murder: 80, Robbery: 170, Theft: 300, Assault: 140 },
+    "goa": { Murder: 10, Robbery: 20, Theft: 90, Assault: 15 },
+    "gujarat": { Murder: 95, Robbery: 200, Theft: 370, Assault: 180 },
+    "haryana": { Murder: 100, Robbery: 220, Theft: 390, Assault: 200 },
+    "himachal-pradesh": { Murder: 35, Robbery: 70, Theft: 120, Assault: 50 },
+    "jharkhand": { Murder: 140, Robbery: 290, Theft: 510, Assault: 240 },
+    "karnataka": { Murder: 120, Robbery: 260, Theft: 450, Assault: 220 },
+    "kerala": { Murder: 90, Robbery: 190, Theft: 340, Assault: 150 },
+    "madhya-pradesh": { Murder: 180, Robbery: 380, Theft: 640, Assault: 300 },
+    "maharashtra": { Murder: 200, Robbery: 420, Theft: 700, Assault: 340 },
+    "manipur": { Murder: 30, Robbery: 60, Theft: 100, Assault: 40 },
+    "meghalaya": { Murder: 25, Robbery: 50, Theft: 90, Assault: 35 },
+    "mizoram": { Murder: 15, Robbery: 30, Theft: 60, Assault: 20 },
+    "nagaland": { Murder: 10, Robbery: 20, Theft: 40, Assault: 15 },
+    "odisha": { Murder: 160, Robbery: 330, Theft: 550, Assault: 270 },
+    "punjab": { Murder: 90, Robbery: 210, Theft: 370, Assault: 170 },
+    "rajasthan": { Murder: 140, Robbery: 300, Theft: 520, Assault: 250 },
+    "sikkim": { Murder: 5, Robbery: 15, Theft: 30, Assault: 10 },
+    "tamil-nadu": { Murder: 110, Robbery: 240, Theft: 430, Assault: 190 },
+    "telangana": { Murder: 100, Robbery: 210, Theft: 390, Assault: 180 },
+    "tripura": { Murder: 20, Robbery: 40, Theft: 70, Assault: 25 },
+    "uttar-pradesh": { Murder: 300, Robbery: 620, Theft: 1000, Assault: 500 },
+    "uttarakhand": { Murder: 50, Robbery: 100, Theft: 170, Assault: 80 },
+    "west-bengal": { Murder: 160, Robbery: 340, Theft: 580, Assault: 260 }
+  };
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const selectedState = urlParams.get('state') || 'andhra-pradesh'; // Default to Andhra Pradesh if no state is selected
+  let chart;
+
+  // Create the Bar, Pie, and Line charts
+  function createCharts() {
+    const crime = crimeData[selectedState];
+    const labels = Object.keys(crime);
+    const data = Object.values(crime);
+
+    const ctxBar = document.getElementById('barChart').getContext('2d');
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    const ctxLine = document.getElementById('lineChart').getContext('2d');
+
+    // Bar Chart
+    new Chart(ctxBar, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Number of Cases',
+          data: data,
+          backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24'],
+          borderColor: '#1f2937',
+          borderWidth: 1
+        }]
+      },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+
+    // Pie Chart
+    new Chart(ctxPie, {
+      type: 'pie',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Number of Cases',
+          data: data,
+          backgroundColor: ['#f87171', '#60a5fa', '#34d399', '#fbbf24']
+        }]
+      },
+      options: { responsive: true }
+    });
+
+    // Line Chart
+    new Chart(ctxLine, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Number of Cases',
+          data: data,
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          borderColor: '#4bc0c0',
+          borderWidth: 2
+        }]
+      },
+      options: { responsive: true, scales: { y: { beginAtZero: true } } }
+    });
+  }
+
+  // Create the table
+  function createTable() {
+    const tableContainer = document.getElementById('crimeTableContainer');
+    const crimes = crimeData[selectedState];
+    let tableHTML = `<table><thead><tr><th>Crime Type</th><th>Number of Cases</th></tr></thead><tbody>`;
+
+    for (const [crime, cases] of Object.entries(crimes)) {
+      tableHTML += `<tr><td>${crime}</td><td>${cases}</td></tr>`;
+    }
+
+    tableHTML += `</tbody></table>`;
+    tableContainer.innerHTML = tableHTML;
+  }
+
+  // Download CSV
+  function downloadCSV() {
+    let csvContent = "Crime Type,Number of Cases\n";
+    for (const [crime, cases] of Object.entries(crimeData[selectedState])) {
+      csvContent += `${crime},${cases}\n`;
+    }
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", selectedState + "_Crime_Report.csv");
+    link.style.display = "none";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  }
+
+  // Print report
+  function printReport() {
+    window.print();
+  }
+
+  // Initialize the page
+  if (crimeData[selectedState]) {
+    document.getElementById('stateName').innerText += selectedState.replace('-', ' ').toUpperCase();
+    createCharts();
+    createTable();
+  } else {
+    document.getElementById('stateName').innerText = "No crime data found for selected state.";
+  }
+
+  function goBack() {
+    window.history.back();
+  }
+
+</script>
+
+</body>
+</html>

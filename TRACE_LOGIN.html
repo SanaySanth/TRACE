@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TRACE | Login</title>
+  <link rel="icon" type="image/png" href="CENTRAL_GOVERNMENT.jpg">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    body, html {
+      height: 100%;
+      background: #f5f5f5; /* Light mode default background */
+      overflow: hidden;
+    }
+
+    .dark-mode {
+      background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+      backdrop-filter: blur(10px);
+      position: relative;
+      z-index: 1;
+    }
+
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(100px);
+      opacity: 0.6;
+      animation: float 10s infinite ease-in-out;
+      z-index: 0;
+      display: none; /* Hidden by default in light mode */
+    }
+
+    .dark-mode .blob {
+      display: block; /* Show in dark mode */
+    }
+
+    .blob1 {
+      top: 10%;
+      left: 10%;
+      width: 300px;
+      height: 300px;
+      background: #007BFF;
+    }
+
+    .blob2 {
+      bottom: 10%;
+      right: 10%;
+      width: 400px;
+      height: 400px;
+      background: #00f7ff;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(0) translateX(0);
+      }
+      50% {
+        transform: translateY(20px) translateX(20px);
+      }
+    }
+
+    .left-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 40px;
+      color: #333; /* Light mode text color */
+      z-index: 2;
+    }
+
+    .dark-mode .left-section {
+      color: #fff; /* Dark mode text color */
+    }
+
+    .logo {
+      width: 120px;
+      margin-bottom: 20px;
+    }
+
+    .left-section h1 {
+      font-size: 2.5rem;
+      margin-bottom: 10px;
+      color: #007BFF; /* Light mode color */
+      text-shadow: none; /* No shadow in light mode */
+    }
+
+    .dark-mode .left-section h1 {
+      text-shadow: 0 0 10px #00f7ff; /* Shadow in dark mode */
+      color: #fff;
+    }
+
+    .left-section p {
+      font-size: 1.2rem;
+      color: #666; /* Light mode color */
+    }
+
+    .dark-mode .left-section p {
+      color: #aaa; /* Dark mode color */
+    }
+
+    .right-section {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .login-form {
+      background: rgba(255, 255, 255, 0.9); /* Light mode background */
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+      color: #333; /* Light mode text color */
+    }
+
+    .dark-mode .login-form {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(15px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      color: #fff;
+    }
+
+    .login-form h2 {
+      margin-bottom: 20px;
+      color: #007BFF; /* Light mode color */
+      text-align: center;
+    }
+
+    .dark-mode .login-form h2 {
+      color: #00f7ff;
+      text-shadow: 0 0 5px #00f7ff;
+    }
+
+    .input-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .input-box input {
+      width: 100%;
+      padding: 12px 40px 12px 12px;
+      border: 1px solid rgba(0, 0, 0, 0.2); /* Light mode border */
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.8); /* Light mode background */
+      color: #333; /* Light mode text color */
+      outline: none;
+    }
+
+    .dark-mode .input-box input {
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      background: transparent;
+      color: #fff;
+    }
+
+    .input-box input::placeholder {
+      color: #888; /* Light mode placeholder */
+    }
+
+    .dark-mode .input-box input::placeholder {
+      color: #bbb;
+    }
+
+    .toggle-password {
+      position: absolute;
+      top: 50%;
+      right: 12px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #666; /* Light mode color */
+    }
+
+    .dark-mode .toggle-password {
+      color: #ccc;
+    }
+
+    .options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 15px;
+    }
+
+    .options a {
+      color: #007BFF; /* Light mode color */
+      text-decoration: none;
+    }
+
+    .dark-mode .options a {
+      color: #00f7ff;
+    }
+
+    .options a:hover {
+      text-decoration: underline;
+    }
+
+    .captcha-box {
+      margin-bottom: 15px;
+      font-size: 0.9rem;
+    }
+
+    .twofa-reminder {
+      font-size: 0.8rem;
+      color: #666; /* Light mode color */
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .dark-mode .twofa-reminder {
+      color: #aaa;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #007BFF, #0056d2); /* Light mode gradient */
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .dark-mode .login-btn {
+      background: linear-gradient(90deg, #00f7ff, #007BFF);
+      color: #000;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(90deg, #0056d2, #003d99);
+      color: #fff;
+    }
+
+    .dark-mode .login-btn:hover {
+      background: linear-gradient(90deg, #007BFF, #0056d2);
+    }
+
+    .create-account {
+      text-align: center;
+      margin-top: 20px;
+      color: #666; /* Light mode color */
+    }
+
+    .dark-mode .create-account {
+      color: #aaa;
+    }
+
+    .create-account a {
+      color: #007BFF; /* Light mode color */
+      text-decoration: none;
+    }
+
+    .dark-mode .create-account a {
+      color: #00f7ff;
+    }
+
+    .create-account a:hover {
+      text-decoration: underline;
+    }
+
+    /* Dark mode toggle button */
+    .dark-mode-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50px;
+      padding: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .dark-mode-toggle {
+      background: rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dark-mode-toggle i {
+      font-size: 20px;
+      color: #333;
+    }
+
+    .dark-mode .dark-mode-toggle i {
+      color: #fff;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+      .left-section, .right-section {
+        width: 100%;
+        height: 50%;
+      }
+      .dark-mode-toggle {
+        top: 10px;
+        right: 10px;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body class="">
+  <div class="dark-mode-toggle" id="darkModeToggle">
+    <i class="fas fa-moon"></i>
+  </div>
+
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <div class="container">
+    <div class="left-section">
+      <img src="Picture1.png" alt="TRACE Logo" class="logo">
+      <h1>TACTICAL REAL TIME ANALYSIS OF CRIMINAL EVENTS</h1>
+      <p>Secure. Reliable. Trusted.</p>
+    </div>
+
+    <div class="right-section">
+      <form id="login-form" class="login-form">
+        <h2>Login</h2>
+
+        <div class="input-box">
+          <input type="email" id="username" placeholder="Email" required>
+        </div>
+
+        <div class="input-box">
+          <input type="password" id="password" placeholder="Password" required>
+          <span class="toggle-password" onclick="togglePassword()">👁️</span>
+        </div>
+
+        <div class="options">
+          <label></label>
+        </div>
+
+        <div class="captcha-box">
+          <label></label>
+        </div>
+
+        <div class="twofa-reminder">
+          <p>Enable Two-Factor Authentication for more security.</p>
+        </div>
+
+        <button type="submit" class="login-btn">Submit</button>
+
+        <div class="create-account">
+          <p>Don't have an account? <a href="CREATE_ACCOUNT.html">Create Account</a></p>
+        </div>
+
+        <div id="error-message" style="color: #007BFF; margin-top: 10px;"></div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      setPersistence, 
+      browserSessionPersistence,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      collection,
+      query,
+      where,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  
+    const firebaseConfig = {
+      apiKey: "AIzaSyC1bCHfPCiBpLXNdLev0TMkGGuAkqQywbQ",
+      authDomain: "trace-601a4.firebaseapp.com",
+      projectId: "trace-601a4",
+      storageBucket: "trace-601a4.appspot.com",
+      messagingSenderId: "492652025922",
+      appId: "1:492652025922:web:935b8e7efe06be845ab5db",
+      measurementId: "G-89T9DRMKZL",
+      databaseURL: "https://trace-601a4-default-rtdb.asia-southeast1.firebasedatabase.app/"
+    };
+  
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+  
+    document.addEventListener("DOMContentLoaded", async () => {
+      // Dark mode toggle functionality
+      const darkModeToggle = document.getElementById('darkModeToggle');
+      const body = document.body;
+      
+      // Check for saved user preference or use light mode as default
+      const savedMode = localStorage.getItem('darkMode');
+      if (savedMode === 'enabled') {
+        body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+      }
+      
+      darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDarkMode = body.classList.contains('dark-mode');
+        
+        if (isDarkMode) {
+          darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+          localStorage.setItem('darkMode', 'enabled');
+        } else {
+          darkModeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+          localStorage.setItem('darkMode', 'disabled');
+        }
+      });
+
+      // Session cleanup - only on login page
+      try {
+        if (window.location.pathname.includes("login.html") || 
+            window.location.pathname === "/") {
+          await signOut(auth);
+          sessionStorage.clear();
+        }
+      } catch (error) {
+        console.log("Session cleanup error:", error);
+      }
+  
+      // Login form handler
+      document.getElementById("login-form").addEventListener("submit", async (e) => {
+        e.preventDefault();
+        
+        const email = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const errorMessage = document.getElementById("error-message");
+        errorMessage.innerText = "";
+  
+        try {
+          // Set persistence to session-only (tab-specific)
+          await setPersistence(auth, browserSessionPersistence);
+  
+          // Check admin collection first
+          const adminQuery = await getDocs(
+            query(collection(db, "admins"), where("email", "==", email))
+          );
+  
+          if (!adminQuery.empty) {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            sessionStorage.setItem("userRole", "admin");
+            window.location.href = "ADMIN_HOME.html";
+            return;
+          }
+  
+          // Check user collection if not admin
+          const userQuery = await getDocs(
+            query(collection(db, "users"), where("email", "==", email))
+          );
+  
+          if (!userQuery.empty) {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            sessionStorage.setItem("userRole", "user");
+            window.location.href = "HOME.html";
+            return;
+          }
+  
+          throw new Error("Account not found in any authorized collection");
+  
+        } catch (error) {
+          console.error("Login error:", error);
+          let errorMsg = "❌ Login failed. Please try again.";
+          
+          if (error.code === "auth/invalid-credential") {
+            errorMsg = "❌ Invalid email or password.";
+          } else if (error.code === "auth/user-not-found") {
+            errorMsg = "❌ User not found. Please check your email.";
+          } else if (error.code === "auth/wrong-password") {
+            errorMsg = "❌ Incorrect password. Please try again.";
+          }
+          
+          errorMessage.innerText = errorMsg;
+        }
+      });
+  
+      // Password toggle function
+      window.togglePassword = function() {
+        const pwd = document.getElementById("password");
+        pwd.type = pwd.type === "password" ? "text" : "password";
+      };
+    });
+  </script>
+</body>
+</html>
